@@ -18,7 +18,7 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 #define pin_temp 0
 #define pin_pot_fan 1
 
-void clear(String *str);ssss
+//void clear(String *str);
 
 void setup() {
 	// set up the LCD's number of columns and rows:
