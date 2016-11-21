@@ -11,12 +11,14 @@
 #include "Arduino.h"
 #include <LiquidCrystal.h>
 #include <time.h>
+#include "libraries/PID/PID_v1.h"
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
 #define pin_temp 0
 #define pin_pot_fan 1
+#define pin_fan 6
 
 //void clear(String *str);
 
@@ -39,6 +41,7 @@ void loop() {
 
 	// potentiometer for manual fan control
 	int pot_fan = analogRead(pin_pot_fan);
+	analogWrite(pin_fan, pot_fan);
 
 	// message buffers
 	String msg_str = "";
