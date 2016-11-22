@@ -39,7 +39,7 @@ float pot_100;
 double PID_Setpoint, PID_Input, PID_Output;
 
 //Specify the links and initial tuning parameters
-double Kp=100, Ki=100, Kd=1;
+double Kp=50, Ki=75, Kd=1;
 
 PID myPID(&PID_Input, &PID_Output, &PID_Setpoint, Kp, Ki, Kd, REVERSE);
 
@@ -57,7 +57,8 @@ void setup() {
 
 	pinMode(13, OUTPUT);
 
-	PID_Input = get_temp();
+	temp_raw = analogRead(pin_temp);
+	PID_Input = get_temp(temp_raw);
 	PID_Setpoint = 30;
 
 	//turn the PID on
@@ -103,7 +104,7 @@ void timerISR()
 
 	prev_pot_fan = pot_fan;
 
-	if (!counter_timer1)
+	if (!counter_timer1) // basically happens every 10th count i.e. effectively 1Hz
 	{
 		// print the number of seconds since reset:
 		time_since_reset = millis() / 1000;
@@ -117,8 +118,8 @@ void timerISR()
 
 
 
-
-		temp = get_temp();
+		temp_raw = analogRead(pin_temp);
+		temp = get_temp(temp_raw);
 
 		PID_Input = temp;
 
@@ -172,10 +173,9 @@ void print_lcd(){
 
 	// set the cursor to column 0, line 1
 	lcd.setCursor(0, 0);
-	msg_lcd.concat(pot_fan);
+	msg_lcd.concat(temp_raw);
 	msg_lcd.concat(' ');
 	msg_lcd.concat(PID_Setpoint);
-	msg_lcd.concat('%');
 	msg_lcd.concat(' ');
 	msg_lcd.concat(PID_Output);
 
@@ -202,9 +202,8 @@ void step_fan(){
 
 }
 
-float get_temp(){
+float get_temp(float temp_raw){
 	// actual temp
-	temp_raw = analogRead(pin_temp);
 	// ** LM35 **
 	// return 0.489*temp_raw - 2;
 

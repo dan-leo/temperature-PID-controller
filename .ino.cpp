@@ -2,7 +2,7 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2016-11-22 13:51:03
+//This file has been generated on 2016-11-22 16:45:56
 
 #include "Arduino.h"
 #include "Arduino.h"
@@ -16,7 +16,7 @@ void slow_loop();
 void timerISR() ;
 void print_lcd();
 void step_fan();
-float get_temp();
+float get_temp(float temp_raw);
 
 #include "temperature_PID.ino"
 
