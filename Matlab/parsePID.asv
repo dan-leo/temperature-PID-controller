@@ -1,0 +1,11 @@
+s = serial('COM4')
+fopen(s)
+
+while true
+    data = fscanf(s)
+C = textscan(data, '%d%f%f%f','delimiter','\t');
+[time, setpoint, input, output] = deal(C{:});
+end
+
+
+fclose(s)

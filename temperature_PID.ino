@@ -137,14 +137,21 @@ void timerISR()
 
 		msg_str.concat(time_since_reset);
 		msg_str.concat('\t');
-		msg_str.concat(temp_raw);
 
+		//		msg_str.concat(temp_raw);
+		//		msg_str.concat('\t');
+		//		msg_str.concat(temp);
+		//		msg_str.concat('\t');
+		//		msg_str.concat(pot_fan);
 
+		msg_str.concat(PID_Setpoint);
 		msg_str.concat('\t');
-		msg_str.concat(temp);
+		msg_str.concat(PID_Input);
 		msg_str.concat('\t');
-		msg_str.concat(pot_fan);
+		msg_str.concat(PID_Output);
+		msg_str.concat('\t');
 		msg_str.concat('\n');
+
 
 		Serial.print(msg_str);
 
@@ -179,8 +186,8 @@ void print_lcd(){
 
 	msg_lcd = "";
 	msg_lcd.concat(time_since_reset);
-//	msg_lcd.concat(' ');
-//	msg_lcd.concat(temp_raw);
+	//	msg_lcd.concat(' ');
+	//	msg_lcd.concat(temp_raw);
 	msg_lcd.concat(' ');
 	msg_lcd.concat(temp);
 	msg_lcd.concat(' ');
