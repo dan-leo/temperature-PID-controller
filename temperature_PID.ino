@@ -17,7 +17,7 @@
 #include <time.h>
 #include "libraries/PID/PID_v1.h"
 //#include "libraries/Timer/Timer.h"
-#include "libraries/SimpleTimer/SimpleTimer.h"
+//#include "libraries/SimpleTimer/SimpleTimer.h"
 #include "libraries/TimerOne/TimerOne.h"
 
 // initialize the library with the numbers of the interface pins
@@ -27,13 +27,21 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 #define pin_pot_fan 1
 #define pin_fan 6
 
-SimpleTimer timer;
+//SimpleTimer timer;
 
 unsigned int counter_timer1 = 0;
 int pot_fan;
 int time_since_reset;
 int temp_raw;
 float temp;
+float pot_100;
+
+double PID_Setpoint, PID_Input, PID_Output;
+
+//Specify the links and initial tuning parameters
+double Kp=100, Ki=100, Kd=1;
+
+PID myPID(&PID_Input, &PID_Output, &PID_Setpoint, Kp, Ki, Kd, REVERSE);
 
 //void clear(String *str);
 void print_lcd();
@@ -48,6 +56,12 @@ void setup() {
 	//	timer.setInterval(1, slow_loop);
 
 	pinMode(13, OUTPUT);
+
+	PID_Input = get_temp();
+	PID_Setpoint = 30;
+
+	//turn the PID on
+	myPID.SetMode(AUTOMATIC);
 
 	Timer1.initialize(100000); // set a timer of length 100000 microseconds (or 0.1 sec - or 10Hz => the led will blink 5 times, 5 cycles of on-and-off, per second)
 	Timer1.attachInterrupt( timerISR ); // attach the service routine here
@@ -79,18 +93,13 @@ void timerISR()
 	// Toggle LED
 	digitalWrite( 13, digitalRead( 13 ) ^ 1 );
 
-	// potentiometer for manual fan control
-	pot_fan = analogRead(pin_pot_fan);
-	pot_fan>>=2;
-	analogWrite(pin_fan, pot_fan);
-
 	// doesn't works
-//	if (pot_fan - prev_pot_fan > -5){
-//		if (pot_fan - prev_pot_fan < 5){
-//			counter_timer1=1;
-//			print_lcd();
-//		}
-//	}
+	//	if (pot_fan - prev_pot_fan > -5){
+	//		if (pot_fan - prev_pot_fan < 5){
+	//			counter_timer1=1;
+	//			print_lcd();
+	//		}
+	//	}
 
 	prev_pot_fan = pot_fan;
 
@@ -99,15 +108,24 @@ void timerISR()
 		// print the number of seconds since reset:
 		time_since_reset = millis() / 1000;
 
-		temp_raw = analogRead(pin_temp);
+		// potentiometer for manual fan control
+		pot_fan = analogRead(pin_pot_fan);
+		pot_fan >>= 2;
+		pot_100 = pot_fan*0.392157;
+		PID_Setpoint = pot_100;
+		// analogWrite(pin_fan, pot_fan);
 
-		// actual temp
 
-		// ** LM35 **
-		// temp = 0.489*temp_raw - 2;
 
-		// ** MSC9700 **
-		temp = 0.489*(temp_raw - 103);
+
+		temp = get_temp();
+
+		PID_Input = temp;
+
+		myPID.Compute();
+
+		analogWrite(pin_fan, PID_Output);
+
 
 		// ** Print to LCD **
 		print_lcd();
@@ -149,8 +167,10 @@ void print_lcd(){
 	lcd.setCursor(0, 0);
 	msg_lcd.concat(pot_fan);
 	msg_lcd.concat(' ');
-	msg_lcd.concat(pot_fan*0.392157);
+	msg_lcd.concat(PID_Setpoint);
 	msg_lcd.concat('%');
+	msg_lcd.concat(' ');
+	msg_lcd.concat(PID_Output);
 
 	lcd.print(msg_lcd);
 
@@ -159,14 +179,28 @@ void print_lcd(){
 
 	msg_lcd = "";
 	msg_lcd.concat(time_since_reset);
-	msg_lcd.concat(' ');
-	msg_lcd.concat(temp_raw);
+//	msg_lcd.concat(' ');
+//	msg_lcd.concat(temp_raw);
 	msg_lcd.concat(' ');
 	msg_lcd.concat(temp);
+	msg_lcd.concat(' ');
+	msg_lcd.concat(PID_Input*100/PID_Setpoint - 100);
 
 	lcd.print(msg_lcd);
 
 	// **********************************************
+}
+
+void step_fan(){
 
 }
 
+float get_temp(){
+	// actual temp
+	temp_raw = analogRead(pin_temp);
+	// ** LM35 **
+	// return 0.489*temp_raw - 2;
+
+	// ** MSC9700 **
+	return 0.489*(temp_raw - 103);
+}
