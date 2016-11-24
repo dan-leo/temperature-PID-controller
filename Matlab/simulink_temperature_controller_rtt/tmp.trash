@@ -1,0 +1,5 @@
+avrdude: ser_open(): can't open device "//./COM6": Access is denied.
+
+
+avrdude done.  Thank you.
+

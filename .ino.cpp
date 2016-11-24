@@ -2,7 +2,7 @@
 //This is a automatic generated file
 //Please do not modify this file
 //If you touch this file your change will be overwritten during the next build
-//This file has been generated on 2016-11-24 14:13:08
+//This file has been generated on 2016-11-24 14:18:34
 
 #include "Arduino.h"
 #include "Arduino.h"
@@ -13,7 +13,6 @@
 #include "functions.h"
 void setup() ;
 void loop() ;
-void slow_loop();
 void timerISR() ;
 void print_lcd();
 void step_fan();
